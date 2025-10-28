@@ -1,5 +1,4 @@
-import { type team } from "./+page.svelte";
-
+import { type team } from "$lib/types/teamTypes";
 export function load(){
     const teamNumbers=[1,2,3,4,5,6];
     const groups:team[]|null[] = []

@@ -1,48 +1,70 @@
 
 <script lang="ts">
 	import { goto } from '$app/navigation';
-    import { type team } from '../../+page.svelte';
     import { page } from '$app/state';
+    import {type team,type entry} from "$lib/types/teamTypes.js"
+    import {ChevronDown,ChevronUp} from "@lucide/svelte"
 	const id = $derived(page.params.groupId);
-    let people:string[] = $state([]);
-    let form:string=$state('');
+    let people:team = $state([]);
+    $inspect(people);
+    let form:entry=$state({name:'',score:0});
     let formErrors = $state('');
 
+    let {data} = $props();
+    if(data.group!=null){
+        people = data.group;
+    }
+
+    const moveUp=(index:number)=>{
+        if(index==0) return;
+        [people[index],people[index-1]] = [people[index-1],people[index]]
+    }
+
+    const moveDown=(index:number)=>{
+        if(index==people.length-1) return;
+        [people[index],people[index+1]] = [people[index+1],people[index]]
+    }
+
     const onclick=()=>{
-        if(people.find((eleme)=>eleme==form)){
+        if(people.find((eleme)=>eleme.name==form.name)){
             formErrors="Name exists";
             setTimeout(()=>{
                 formErrors='';
             },2000);
         }
         else {
-            people.push(form);
+            people.push({name:form.name,score:form.score});
         }
-        form='';
+        form.name='';
+        form.score=0;
     }
 
     const remove=(removes:string)=>{
-        people=people.filter((elem)=>elem!=removes)
+        people=people.filter((elem)=>elem.name!=removes)
     }
 
     const save=()=>{
-        let group:team = [];
-        people.forEach((name)=>{
-            group.push({name:name,score:"0"});
-        });
-
-        localStorage.setItem(`group${id}`,JSON.stringify(group));
-        goto('/');
+        if(people.length>0)
+            localStorage.setItem(`group${id}`,JSON.stringify(people));
+        else
+            localStorage.removeItem(`group${id}`);
+        goto(`/round/${id}`);
     }
 </script>
 
-{#snippet entry(name:string,index:number)}
+{#snippet entry(player:entry,index:number)}
     <div class="contain-content w-fit items-center" >
-        <p>Player {index+1}</p>
+        <span class="flex flex-row">
+             <p>Player {index+1}</p>
+             <span class="flex flex-col">
+                <button onclick={()=>moveUp(index)}><ChevronUp size=16/></button>
+                <button onclick={()=>moveDown(index)}><ChevronDown size=16/></button>
+             </span>
+        </span>
         <label class="label">
             <span class="flex flex-row p:2">
-                <input class="input bg-gray-400 text-black mr-4 cursor-default" type="text" value={name} readonly onclick={()=>{form=name;remove(name);}}/>
-                <button class="btn preset-filled-error-500" onclick={()=>remove(name)}>Remove</button>
+                <input class="input bg-gray-400 text-black mr-4 cursor-default" type="text" value={player.name+" Score: "+player.score} readonly onclick={()=>{form=player;remove(player.name);}}/>
+                <button class="btn preset-filled-error-500" onclick={()=>remove(player.name)}>Remove</button>
             </span>
         </label>
     </div>
@@ -52,17 +74,20 @@
 
 <div class="w-full p-4 lg:w-[70%] preset-filled-secondary-300-700 m-4 space-y-3 min-h-[60%] lg:min-h-[30%] flex flex-col">
         <div class="grid grid-cols-1 md:grid-cols-3 gap-y-2">
-            {#each people as name, index}
-                {@render entry(name,index)}
+            {#each people as singleEntry, index}
+                {@render entry(singleEntry,index)}
             {/each}
         </div>
         <label class="label">
             <span class="label-text {formErrors && 'text-error-500'}">{formErrors?formErrors:'Name'}</span>
             <span class="flex flex-row p:2">
-                <input class="input bg-gray-400 text-black mr-4 {formErrors && 'ring-error-500'}" bind:value={form} type="text" />
-                <button class="btn preset-filled-primary-500" {onclick} disabled={!form}>Add</button>
+                <input class="input bg-gray-400 text-black mr-4 {formErrors && 'ring-error-500'}" bind:value={form.name} type="text" />
+                <button class="btn preset-tonal-primary" {onclick} disabled={!form}>Add</button>
             </span>
         </label>
-        <button class="btn preset-filled-success-500 self-center" onclick={save}>Add and play</button>
+        <span class="flex flex-row self-center space-x-3">
+            <button class="btn preset-filled-warning-400-600 self-center" onclick={()=>{people=[];}}>Clear All</button>
+        <button class="btn preset-filled-success-400-600 self-center" onclick={save}>Save and play</button>
+        </span>
     
 </div>

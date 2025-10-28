@@ -1,18 +1,11 @@
-<script module>
- export type teamEntry={
-        name:string,
-        score:string
-    }
-
-    export type team=teamEntry[];
-</script>
-
 <script lang="ts">
 	import { goto } from "$app/navigation";
 
     import {PlusIcon} from "@lucide/svelte"
+    import {type team,type entry} from "$lib/types/teamTypes.js"
     
     let {data} = $props();
+    
     $inspect(data);
     
 </script>
