@@ -13,4 +13,8 @@
 
 <LightSwitch></LightSwitch>
 
+<div class="w-full h-full m-0 p-4 flex flex-col justify-center items-center">
 {@render children?.()}
+
+</div>
+
