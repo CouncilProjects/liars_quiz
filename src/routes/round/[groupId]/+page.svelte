@@ -30,15 +30,33 @@
 		'How many pets have you had in your lifetime?'
 	];
 
+    const useTTS=(message:string)=>{
+        const utterThis = new SpeechSynthesisUtterance(message);
+        utterThis.rate=0.3;
+        utterThis.pitch=0.5;
+        try {
+
+            // Check if there are voices loaded
+            if (synth.getVoices().length > 0) {
+                synth.speak(utterThis);
+            } else {
+            // No voices loaded — fallback
+                const beep = new Audio('/confirm.mp3');
+                beep.play();
+            }
+        } catch (e) {
+            // Any other error — fallback
+            const beep = new Audio('/confirm.mp3');
+            beep.play();
+        }
+    }
+
     let normalQuestion=-1;
     let imposterQuestion=-1;
     let imposter=-1;
     
     const startRound=()=>{
-        const utterThis = new SpeechSynthesisUtterance(`Everyone close your eyes and wait`);
-        utterThis.rate=0.3;
-        utterThis.pitch=0.5;
-        synth.speak(utterThis);
+        useTTS("Everyone Close your eyes and wait");
             
         normalQuestion= Math.floor(Math.random() * questions.length); //find random normal question
         imposterQuestion= Math.floor(Math.random() * questions.length); //find imposter question
@@ -54,26 +72,20 @@
         // give time before starting for all to close their eyes
         setTimeout(() => {
             ready=true;
-            
-            const utterThis = new SpeechSynthesisUtterance(`Open your eyes ${data.group![current+1].name} `);
-            utterThis.rate=0.3;
-            utterThis.pitch=0.5;
-            synth.speak(utterThis);
+            useTTS(`Open your eyes ${data.group![current+1].name} `)
             current++;
-            
         }, 3000);
     }
     startRound();
+
+    
 
     const moveQuestioning=()=>{
         visibleNextButton=false;
         const sound = new Audio('/confirm.mp3');
         sound.play();
         setTimeout(()=>{
-            const utterThis = new SpeechSynthesisUtterance(`Open your eyes ${data.group![current+1].name} `);
-            utterThis.rate=0.3;
-            utterThis.pitch=0.5;
-            synth.speak(utterThis);
+            useTTS(`Open your eyes ${data.group![current+1].name} `);
             current++;
             visibleNextButton=true;
         },3000);
@@ -81,10 +93,7 @@
 
     const moveToVoting=()=>{
         stage="inter";
-        const utterThis = new SpeechSynthesisUtterance(`Find the imposter `);
-            utterThis.rate=0.3;
-            utterThis.pitch=0.5;
-            synth.speak(utterThis);
+        useTTS("Find the Imposter");
     }
 
    
