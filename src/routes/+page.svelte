@@ -12,7 +12,7 @@
 
 
 {#snippet teamCard(names:team|null,index:number)}
-    <button class="card preset-tonal-primary flex justify-center items-center min-h-32 flex-col hover:preset-filled" onclick={()=>{goto(`/add/${(index+1)}`)}}>
+    <button class="card preset-tonal-primary flex justify-center items-center min-h-32 flex-col hover:preset-filled" onclick={()=>{goto(names?`/leaderboard/${(index+1)}`:`/add/${(index+1)}`)}}>
         {#if names}
             {#each names as name,i}
                 {#if i<2}

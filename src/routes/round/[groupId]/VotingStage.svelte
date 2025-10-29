@@ -1,5 +1,5 @@
 <script lang="ts">
-    let {question,players,answers,voteFunction} = $props();
+    let {question,players,answers,voteFunction,impostor} = $props();
 </script>
 
 
@@ -9,10 +9,10 @@
     <p>Each player answered</p>
     <div class="grid grid-cols-1 md:grid-cols-2 p-2 gap-y-2 gap-x-3">
         {#each players as name,i}
-           <div class="card preset-filled-primary-200-800 flex flex-col text-center text-lg md:text-2xl self-center justify-center items-center p-2">
-                <p>{name} says:</p>
+           <div class="card {impostor==i?'preset-tonal-error':'preset-filled-primary-200-800'} flex flex-col text-center text-lg md:text-2xl self-center justify-center items-center p-2">
+                <p class="{impostor==i ? 'text-red-600':''}">{name} says:</p>
                 <p>{answers[i]}</p>
-                <button class="btn preset-filled-tertiary-400-600 w-fit text-xs" onclick={()=>voteFunction(i)}>Vote</button>
+                <button class="btn preset-filled-tertiary-400-600 w-fit text-xs {impostor!=null && 'hidden'}" onclick={()=>voteFunction(i)}>Vote</button>
             </div>
             
         {/each}

@@ -1,6 +1,7 @@
 export type entry={
     name:string,
-    score:number
+    score:number,
+    impostor:number
 }
 
 export type team = entry[]

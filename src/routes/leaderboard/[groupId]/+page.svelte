@@ -3,6 +3,7 @@
     import type { PageProps } from './$types';
     
     let { params,data }:PageProps = $props();
+    const sorted = [...data.group].sort((a, b) => b.score - a.score);
 </script>
 
 
@@ -12,7 +13,7 @@
         <table class="table caption-bottom space-y-2">
             <tbody class="[&>tr]:hover:preset-tonal-primary">
             
-               {#each data.group.sort((a, b) => b.score - a.score) as row}
+               {#each sorted as row}
                 <tr>
                         <td>{row.name}</td>
                         <td>{row.score}</td>
@@ -21,8 +22,10 @@
             </tbody>
         </table>
     </div>
-    <span class="flex flex-row">
-        <a class="btn preset-filled-secondary-400-600" href="/">Home</a>
+    <span class="flex flex-wrap justify-evenly mt-3">
+        <a class="btn preset-tonal-secondary" href="/">Home</a>
+        <a class="btn preset-tonal-secondary" href="/add/{params.groupId}">Edit Team</a>
         <a class="btn preset-filled-primary-400-600" href="/round/{params.groupId}">Play again</a>
+
     </span>
 </div>

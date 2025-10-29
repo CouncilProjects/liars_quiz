@@ -5,9 +5,10 @@
     import {type team,type entry} from "$lib/types/teamTypes.js"
     import {ChevronDown,ChevronUp} from "@lucide/svelte"
 	const id = $derived(page.params.groupId);
+    const isSmall=$derived(window.innerWidth<640);
     let people:team = $state([]);
     $inspect(people);
-    let form:entry=$state({name:'',score:0});
+    let form:entry=$state({name:'',score:0,impostor:0});
     let formErrors = $state('');
 
     let {data} = $props();
@@ -33,10 +34,11 @@
             },2000);
         }
         else {
-            people.push({name:form.name,score:form.score});
+            people.push({name:form.name,score:form.score,impostor:form.impostor});
         }
         form.name='';
         form.score=0;
+        form.impostor=0;
     }
 
     const remove=(removes:string)=>{
@@ -48,7 +50,7 @@
             localStorage.setItem(`group${id}`,JSON.stringify(people));
         else
             localStorage.removeItem(`group${id}`);
-        goto(`/round/${id}`);
+        goto(`/`);
     }
 </script>
 
@@ -63,7 +65,7 @@
         </span>
         <label class="label">
             <span class="flex flex-row p:2">
-                <input class="input bg-gray-400 text-black mr-4 cursor-default" type="text" value={player.name+" Score: "+player.score} readonly onclick={()=>{form=player;remove(player.name);}}/>
+                <input class="input bg-gray-400 text-black mr-4 cursor-default" type="text" value={!isSmall?player.name+" Score: "+player.score:player.name} readonly onclick={()=>{form=player;remove(player.name);}}/>
                 <button class="btn preset-filled-error-500" onclick={()=>remove(player.name)}>Remove</button>
             </span>
         </label>
@@ -78,16 +80,24 @@
                 {@render entry(singleEntry,index)}
             {/each}
         </div>
-        <label class="label">
-            <span class="label-text {formErrors && 'text-error-500'}">{formErrors?formErrors:'Name'}</span>
-            <span class="flex flex-row p:2">
-                <input class="input bg-gray-400 text-black mr-4 {formErrors && 'ring-error-500'}" bind:value={form.name} type="text" />
+        <span class="flex flex-col md:flex-row p-2 space-x-1">
+            <label class="label flex-8">
+                <span class="label-text {formErrors && 'text-error-500'}">{formErrors?formErrors:'Name'}</span>
+                <input class="input bg-gray-400 text-black mr-4 {formErrors && 'ring-error-500'} flex-8" bind:value={form.name} type="text" />
+            </label>
+                    
+            <label class="label flex-2">
+                <span class="label-text {formErrors && 'text-error-500'}">{formErrors?formErrors:'Score'}</span>
+                <span class="flex flex-row">
+                    <input class="input bg-gray-400 text-black mr-4 {formErrors && 'ring-error-500'} flex-2" bind:value={form.score} type="text" />
                 <button class="btn preset-tonal-primary" {onclick} disabled={!form}>Add</button>
-            </span>
-        </label>
+                </span>
+            </label>
+            
+        </span>
         <span class="flex flex-row self-center space-x-3">
             <button class="btn preset-filled-warning-400-600 self-center" onclick={()=>{people=[];}}>Clear All</button>
-        <button class="btn preset-filled-success-400-600 self-center" onclick={save}>Save and play</button>
+        <button class="btn preset-filled-success-400-600 self-center" onclick={save}>Save</button>
         </span>
     
 </div>
