@@ -1,21 +1,7 @@
 <script lang="ts">
 	import '../app.css';
-	import favicon from '$lib/assets/favicon.svg';
 	import LightSwitch from '$lib/components/LightSwitch.svelte';
-	import { onMount } from 'svelte';
 
-	
-
-	onMount(async () => {
-    if ('serviceWorker' in navigator) {
-      try {
-        const registration = await navigator.serviceWorker.register('/sw.js');
-        console.log('Service Worker registered:', registration);
-      } catch (err) {
-        console.error('SW registration failed:', err);
-      }
-    }
-  });
   let { children } = $props();
 </script>
 
