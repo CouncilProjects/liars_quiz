@@ -74,7 +74,7 @@
 
 
 
-<div class="w-full p-4 lg:w-[70%] preset-filled-secondary-300-700 m-4 space-y-3 min-h-[60%] lg:min-h-[30%] flex flex-col">
+<div class="w-full p-4 lg:w-[70%] preset-filled-surface-300-700 m-4 space-y-3 min-h-[60%] lg:min-h-[30%] flex flex-col">
         <div class="grid grid-cols-1 md:grid-cols-3 gap-y-2">
             {#each people as singleEntry, index}
                 {@render entry(singleEntry,index)}
@@ -83,13 +83,13 @@
         <span class="flex flex-col md:flex-row p-2 space-x-1">
             <label class="label flex-8">
                 <span class="label-text {formErrors && 'text-error-500'}">{formErrors?formErrors:'Name'}</span>
-                <input class="input bg-gray-400 text-black mr-4 {formErrors && 'ring-error-500'} flex-8" bind:value={form.name} type="text" />
+                <input class="input bg-surface-400-600 {formErrors && 'ring-error-500'} flex-8" bind:value={form.name} type="text" />
             </label>
                     
             <label class="label flex-2">
                 <span class="label-text {formErrors && 'text-error-500'}">{formErrors?formErrors:'Score'}</span>
                 <span class="flex flex-row">
-                    <input class="input bg-gray-400 text-black mr-4 {formErrors && 'ring-error-500'} flex-2" bind:value={form.score} type="text" />
+                    <input class="input bg-surface-400-600 {formErrors && 'ring-error-500'} flex-2 mr-1" bind:value={form.score} type="text" />
                 <button class="btn preset-tonal-primary" {onclick} disabled={!form}>Add</button>
                 </span>
             </label>

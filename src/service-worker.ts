@@ -3,6 +3,7 @@
 /// <reference no-default-lib="true"/>
 /// <reference lib="esnext" />
 /// <reference lib="webworker" />
+/// <reference types="@sveltejs/kit" />
 
 import {version,files,build} from "$service-worker";
 
@@ -13,31 +14,25 @@ const CACHE = `liars-quiz-${version}`;
 
 const ASSETS = [
     ...build,
-    ...files
+    ...files,
+    '/'
 ]
+
+let pwa=false;
 
 //when i am installed i want to cashe everything so i have 100% offline. 
 
-self.addEventListener('install', (event : ExtendableEvent) => {
-	// Create a new cache and add all files to it
-	async function addFilesToCache() {
-		const cache = await caches.open(CACHE);
-		await cache.addAll(ASSETS);
-        console.log('[SERVICE-WORKER]: cashed '+ASSETS.length+' files');
-	}
-
-    event.waitUntil(
-        addFilesToCache()
-            .then(() => {
-                console.log("[SERVICE-WORKER]: Completed");
-                return self.skipWaiting();
-            })
-    );
+self.addEventListener('install', () => {
+    console.log('[SW] installed successfully');
+    self.skipWaiting();
 });
 
+
 // delete old cashes
-self.addEventListener('activate', (event) => {
+self.addEventListener('activate', async (event) => {
     console.log('[SW] Activating version:', version);
+    console.log('[SERVICE-WORKER] Claiming clients');
+    await self.clients.claim();
     async function deleteOldCache(){
         const cachesNames = await caches.keys;
 
@@ -48,46 +43,73 @@ self.addEventListener('activate', (event) => {
             }
         }
 
-        console.log('[SERVICE-WORKER] Claiming clients');
-        await self.clients.claim();
     }
+
+    //deleteOldCache();
 });
 
-self.addEventListener('fetch',(event)=>{
-    //get the request
-    const {request} =event;
-    const url= new URL(request.url);
 
-    //i will only handle get request form the origin
-    if (request.method !== 'GET' || url.origin !== self.location.origin) {
-        return;
-    }
-
-    async function createResponse() {
-        //open the cache (we will go for a cache first strategy)
-        const cache = await caches.open(CACHE);
-
-        // first we have the easy one, an exact match
-        const cachedResp = await cache.match(request);
-        if(cachedResp){
-            return cachedResp;
+self.addEventListener('message',(event)=>{
+    if(event.data?.type=="Install PWA"){
+        async function addFilesToCache() {
+            const cache = await caches.open(CACHE);
+            try {
+                await cache.addAll(ASSETS);
+            } catch (error) {
+                console.error("Assets failed: "+ASSETS);
+            }
+            console.log('[SERVICE-WORKER]: cashed '+ASSETS.length+' files');
         }
 
-        //else try network
-        try {
-            const networkResp = await fetch(request);
-            if(networkResp.ok){
-                //put it in cache
-                cache.put(request,networkResp.clone()); //macth the request to a resource
-                return networkResp;
-            }
-            return undefined;
-        } catch (error) {
-            if(event.request.mode=='navigate'){
-                return cache.match('/index.html'); //let the sveltekit take care of it. 
-            }
-            throw new Error('Network failed');
-        }   
+        event.waitUntil(
+            addFilesToCache()
+                .then(() => {
+                    console.log("[SERVICE-WORKER]: Completed");
+                })
+        );
     }
-    event.respondWith(createResponse());
+
+    if(event.data.type=="As PWA"){
+        console.log("Running PWA");
+        pwa=true;
+    }
 })
+
+self.addEventListener('fetch', (event) => {
+    const request = event.request;
+    const url = new URL(request.url);
+
+    // Only GET from our origin
+    if (request.method !== 'GET' || url.origin !== self.location.origin) return;
+
+    event.respondWith((async () => {
+        const cache = await caches.open(CACHE);
+
+        // Try cache first
+        const cached = await cache.match(request);
+        if(!cached) console.log("I didnt cache that "+ request.url);
+        if (cached) return cached;
+
+        try {
+            const network = await fetch(request);
+
+            if (network.ok) {
+                if(pwa){
+                    cache.put(request, network.clone());
+                }
+                
+                return network;
+            }
+
+            return Response.error();
+        } catch (err) {
+            // Offline fallback for navigation requests
+            if (request.mode === 'navigate') {
+                console.log("navigations");
+                return (await cache.match('/')) || Response.error();
+            }
+
+            return Response.error();
+        }
+    })());
+});

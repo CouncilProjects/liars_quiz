@@ -6,7 +6,6 @@
 
   let { children } = $props();
   let installable = $state(false);
-
   let installPrompt:any|null=null;
 
   function  registerSW() {
@@ -18,6 +17,31 @@
         .catch((error)=>{console.error('SW registration failed:', error);})
     }
   }
+
+  function isRunningAsPWA() {
+    return window.matchMedia('(display-mode: standalone)').matches
+        || (navigator as any).standalone === true;
+  }
+
+  function notifySWRunPWA(){
+    navigator.serviceWorker.controller?.postMessage({type:"As PWA"});
+    console.log("[LOG] SW notified to act like a PWA.");
+  }
+
+  function notifySWForInstall(){
+    navigator.serviceWorker.controller?.postMessage({type:"Install PWA"});
+    console.log("[LOG] SW notified to act like a PWA.");
+  }
+
+  //register SW
+  onMount(()=>{
+    registerSW();
+    if(isRunningAsPWA()){
+      notifySWRunPWA();
+    }
+  })
+
+  
 
   function installableHandler(event:Event){
     event.preventDefault();
@@ -31,24 +55,22 @@
     }
 
     const result = await installPrompt.prompt();
-    notInstall();
+
+    removeInstallButton();
   }
 
-  function notInstall(){
+  function removeInstallButton(){
     installPrompt=null;
     installable=false;
   }
 
-  //register SW
-  onMount(()=>{
-    registerSW();
-  })
+  
 </script>
 
 <!--appinstalled when its aready installed, beforeinstallprompt when its installable-->
 <svelte:window  
 onbeforeinstallprompt={installableHandler}
-onappinstalled={notInstall}
+onappinstalled={()=>{removeInstallButton();notifySWForInstall();}}
 />
 
 
