@@ -3,13 +3,14 @@
 
     import {PlusIcon} from "@lucide/svelte"
     import {type team,type entry} from "$lib/types/teamTypes.js"
-    
+    import {Settings} from "@lucide/svelte";
     let {data} = $props();
     
     $inspect(data);
     
 </script>
 
+<a class="btn preset-tonal-primary" href="/settings">Settings <Settings/></a>
 
 {#snippet teamCard(names:team|null,index:number)}
     <button class="card preset-tonal-primary flex justify-center items-center min-h-32 flex-col hover:preset-filled" onclick={()=>{goto(names?`/leaderboard/${(index+1)}`:`/add/${(index+1)}`)}}>

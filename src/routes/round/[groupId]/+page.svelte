@@ -4,6 +4,8 @@
 	import VotingStage from './VotingStage.svelte';
     const synth = window.speechSynthesis;
 	let { data } = $props();
+
+    
     if(data.group==null){
         goto('/');
     } else{
@@ -32,8 +34,8 @@
 
     const useTTS=(message:string)=>{
         const utterThis = new SpeechSynthesisUtterance(message);
-        utterThis.rate=0.3;
-        utterThis.pitch=0.5;
+        utterThis.rate=data.rate || 1;
+        utterThis.pitch=data.pitch || 1;
         try {
 
             // Check if there are voices loaded
@@ -74,7 +76,7 @@
             ready=true;
             useTTS(`Open your eyes ${data.group![current+1].name} `)
             current++;
-        }, 3000);
+        }, 4000);
     }
     startRound();
 
@@ -138,7 +140,7 @@
     {#if stage=="quest"}
         <div class="flex flex-col justify-center items-center">
             <AnswerCard question={questions[current!=imposter?normalQuestion:imposterQuestion]}
-                imposter={current==imposter}
+                imposter={current==imposter && data.mode=="normal"}
                 player={data.group[current].name}
                 bind:ansState={answers[current]}></AnswerCard> <!--I need to bind it so the component can use it as a 2-way communication-->
             {#if current==data.group.length-1}

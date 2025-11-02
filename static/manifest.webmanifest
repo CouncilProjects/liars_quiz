@@ -1,7 +1,7 @@
 {
   "name": "Liars Quiz",
   "short_name": "Liars Quiz",
-  "description": "Liars Quiz Game",
+  "description": "Liars Quiz can also be played fully offline",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",

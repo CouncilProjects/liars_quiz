@@ -10,4 +10,14 @@ declare global {
 	}
 }
 
+/// <reference types="svelte" />
+
+declare namespace svelteHTML {
+    interface SvelteWindowAttributes {
+        'onappinstalled'?: (event: Event) => void;
+    }
+}
+
+
+
 export {};
