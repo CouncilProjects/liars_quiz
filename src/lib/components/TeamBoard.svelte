@@ -1,9 +1,7 @@
 <script lang="ts">
-	import { goto } from '$app/navigation';
-    import type { PageProps } from './$types';
     
-    let { params,data }:PageProps = $props();
-    const sorted = [...data.group].sort((a, b) => b.score - a.score);
+    let { groupid,teamdata,game } = $props();
+    const sorted = [...teamdata.group].sort((a, b) => b.score - a.score);
 </script>
 
 
@@ -23,9 +21,9 @@
         </table>
     </div>
     <span class="flex flex-wrap justify-evenly mt-3">
-        <a class="btn preset-tonal-secondary" href="/">Home</a>
-        <a class="btn preset-tonal-secondary" href="/add/{params.groupId}">Edit Team</a>
-        <a class="btn preset-filled-primary-400-600" href="/round/{params.groupId}">Play again</a>
+        <a class="btn preset-tonal-secondary" href="/{game}">Home</a>
+        <a class="btn preset-tonal-secondary" href="general/{game}/add/{groupid}">Edit Team</a>
+        <a class="btn preset-filled-primary-400-600" href="/{game}/round/{groupid}">Play again</a>
 
     </span>
 </div>

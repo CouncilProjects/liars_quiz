@@ -1,9 +1,9 @@
 import { type team } from "$lib/types/teamTypes";
-export function load(){
+export function gatherTeams(forGame:string){
     const teamNumbers=[1,2,3,4,5,6];
-    const groups:team[]|null[] = []
+    const groups:(team|null)[] = []
     teamNumbers.forEach(element => {
-        const stored = localStorage.getItem("group"+element);
+        const stored = localStorage.getItem(`${forGame}-group`+element);
         if(stored){
             groups[element-1] = JSON.parse(stored);
         }

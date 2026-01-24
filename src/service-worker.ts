@@ -34,33 +34,38 @@ self.addEventListener('activate', async (event) => {
     console.log('[SERVICE-WORKER] Claiming clients');
     await self.clients.claim();
     async function deleteOldCache(){
+        let newRequired = false;
         const cachesNames = await caches.keys;
 
         for(const singlecache in cachesNames){
-            if(singlecache!=CACHE){
+            if(singlecache!=CACHE && singlecache.includes("liars-quiz")){
                 console.log('[SERVICE-WORKER] Deleting old cache:', name);
                 await caches.delete(name);
+                newRequired=true; //if there is a previous chach then i am propable installed
             }
+        }
+
+        if(newRequired){
+            await addFilesToCache();
         }
 
     }
 
-    //deleteOldCache();
+    deleteOldCache();
 });
 
+async function addFilesToCache() {
+    const cache = await caches.open(CACHE);
+    try {
+        await cache.addAll(ASSETS);
+    } catch (error) {
+        console.error("Assets failed: " + ASSETS);
+    }
+    console.log('[SERVICE-WORKER]: cashed ' + ASSETS.length + ' files');
+}
 
 self.addEventListener('message',(event)=>{
     if(event.data?.type=="Install PWA"){
-        async function addFilesToCache() {
-            const cache = await caches.open(CACHE);
-            try {
-                await cache.addAll(ASSETS);
-            } catch (error) {
-                console.error("Assets failed: "+ASSETS);
-            }
-            console.log('[SERVICE-WORKER]: cashed '+ASSETS.length+' files');
-        }
-
         event.waitUntil(
             addFilesToCache()
                 .then(() => {

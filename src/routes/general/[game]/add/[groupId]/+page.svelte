@@ -4,14 +4,18 @@
     import { page } from '$app/state';
     import {type team,type entry} from "$lib/types/teamTypes.js"
     import {ChevronDown,ChevronUp} from "@lucide/svelte"
+	import type { PageProps } from './$types';
 	const id = $derived(page.params.groupId);
+    const game = $derived(page.params.game);
     const isSmall=$derived(window.innerWidth<640);
     let people:team = $state([]);
     $inspect(people);
     let form:entry=$state({name:'',score:0,impostor:0});
     let formErrors = $state('');
 
-    let {data} = $props();
+    let {params,data}:PageProps = $props();
+
+    
     if(data.group!=null){
         people = data.group;
     }
@@ -47,10 +51,10 @@
 
     const save=()=>{
         if(people.length>0)
-            localStorage.setItem(`group${id}`,JSON.stringify(people));
+            localStorage.setItem(`${game}-group${id}`,JSON.stringify(people));
         else
-            localStorage.removeItem(`group${id}`);
-        goto(`/`);
+            localStorage.removeItem(`${game}-group${id}`);
+        goto(`/${game}`);
     }
 </script>
 

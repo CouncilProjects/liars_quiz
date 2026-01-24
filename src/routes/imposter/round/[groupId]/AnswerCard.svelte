@@ -6,7 +6,7 @@
 
 <div class="card {imposter?'preset-filled-error-300-700':'preset-filled-primary-300-700'} p-4 m-2">
 	<p>For {player}</p>
-	<p class="h4">{question}</p>
+	<p class="h4 uppercase">{question}</p>
     {#if imposter}
         <p class="text-base">You are a fake</p>
     {/if}

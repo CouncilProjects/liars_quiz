@@ -17,7 +17,7 @@
 	}
 
 	(() => {
-		const settings = localStorage.getItem('settings');
+		const settings = localStorage.getItem('imposter-settings');
 		if (settings) {
 			const parsed = JSON.parse(settings);
             console.log(parsed);
@@ -29,7 +29,7 @@
 
 	function saveSettings() {
 		localStorage.setItem(
-			'settings',
+			'imposter-settings',
 			JSON.stringify({ mode: mode, sRate: speechsetting.rate, sPitch: speechsetting.pitch })
 		);
         changes=false;
@@ -38,7 +38,7 @@
 
 
 {#if ready}
-    <a class="btn preset-tonal-secondary" href="/">Home</a>
+    <a class="btn preset-tonal-secondary" href="/imposter">Home</a>
 <div class="flex flex-col space-y-3 card preset-filled-surface-400-600 m-3 p-4 w-full sm:w-[40%]">
 	<div class="flex flex-col space-y-3 card preset-filled-surface-300-700 p-2">
         <h6 class="h6 self-center">Mode change</h6>
