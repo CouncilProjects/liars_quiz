@@ -8,4 +8,4 @@
     
 </script>
 
-<TeamSelection game="fake-out" teamData={data} providesSettings={false}></TeamSelection>
+<TeamSelection game="fake-out" teamData={data} providesSettings={true}></TeamSelection>

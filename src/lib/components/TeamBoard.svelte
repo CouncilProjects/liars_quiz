@@ -22,7 +22,7 @@
     </div>
     <span class="flex flex-wrap justify-evenly mt-3">
         <a class="btn preset-tonal-secondary" href="/{game}">Home</a>
-        <a class="btn preset-tonal-secondary" href="general/{game}/add/{groupid}">Edit Team</a>
+        <a class="btn preset-tonal-secondary" href={`/general/${game}/add/${groupid}`}>Edit team</a>
         <a class="btn preset-filled-primary-400-600" href="/{game}/round/{groupid}">Play again</a>
 
     </span>

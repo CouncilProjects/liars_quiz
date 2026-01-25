@@ -6,7 +6,7 @@ export const load: PageLoad = ({ params }) => {
     if (group == null) return { group: null };
     const myGroup:team = JSON.parse(group);
     
-    const settings = localStorage.getItem('settings');
+    const settings = localStorage.getItem('fake-out-settings');
     if (settings) {
         const parsed = JSON.parse(settings);
             return { 
@@ -17,5 +17,5 @@ export const load: PageLoad = ({ params }) => {
                 pitch:parsed.sPitch};
     }
     
-    return { group:  myGroup,groupId:params.groupId};
+    return { group:  myGroup,groupId:params.groupId,mode:'normal'};
 };

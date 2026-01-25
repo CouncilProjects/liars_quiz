@@ -207,7 +207,9 @@
     })();
 
     useTTS("Everyone close your eyes and wait",data.rate,data.pitch);
-    //make order of people for when its time to figure out.
+    if(data.mode=='sabotage'){
+        useTTS("The spy has done sabotage",data.rate,data.pitch);
+    }
     
     
 
@@ -217,8 +219,8 @@
     
     setTimeout(()=>{
         currentTurn=0;
-        useTTS(`Open your eyes ${group[currentTurn].name}`);
-        document.forms[0].submit();
+        useTTS(`Open your eyes ${group[currentTurn].name}`,data.rate,data.pitch);
+        if(data.mode=='sabotage') countDown();
     },4000);
 
     const personVoted=(index:number)=>{
@@ -246,24 +248,40 @@
     }
 
     function nextTurn(){
-        useTTS(`Close your eyes ${group[currentTurn].name}`);
+        useTTS(`Close your eyes ${group[currentTurn].name}`,data.rate,data.pitch);
         
         setTimeout(()=>{
             showHint=false;
             if(currentTurn==group.length-1){
                 votingStage=true;
-                useTTS(`Open your eyes everyone`);
+                useTTS(`Open your eyes everyone`,data.rate,data.pitch);
                 return;
             }
             currentTurn++;
-            useTTS(`Open your eyes ${group[currentTurn].name}`);
+            useTTS(`Open your eyes ${group[currentTurn].name}`, data.rate,data.pitch);
+            if(data.mode=='sabotage') countDown();
         },3000);
+    }
+
+    let timeLim = $state(-1);
+    function countDown(){
+        timeLim=3;
+        let intervalID = setInterval(()=>{
+            timeLim--;
+            if(timeLim==0) {
+                nextTurn();
+                clearInterval(intervalID);
+                return;
+            }
+        },1000);
+        
     }
 
     let url = ["https://www.google.com/search?igu=1","&q=judy+hops","&tbm=isch"];
     let urlDone=$state(false);
     let showHint = $state(false);
     (()=>{
+        if(data.mode!='normal') return;
         let curWord = wordslist[category][word];
         url[1] = "&q="+encodeURIComponent(curWord);
         if(online.current){
@@ -279,9 +297,10 @@
         <p>You are not the spy.</p>
         <p class="h4 uppercase">{word}</p>
         <p class="caption-bottom">Category {category}</p>
-        <button class={`btn preset-tonal-secondary ${showHint==true || !online.current ? 'hidden' : ''}`} onclick={()=>{showHint=true;}}>Show hint</button>
+        <button class={`btn preset-tonal-secondary ${showHint==true ||data.mode!='normal' || !online.current ? 'hidden' : ''}`} onclick={()=>{showHint=true;}}>Show hint</button>
     </div>
 {/snippet}
+
 
 {#snippet mission(name:string,mission:string,category:string|null)}
     <div class="card preset-filled-error-300-700 p-4 m-2">
@@ -289,21 +308,26 @@
         <p>You are the spy.</p>
         <p class="h4 uppercase">{mission}</p>
         {#if category}
-            <p class="caption-bottom">Category {category}</p>
+            <p class="caption-bottom">SABOTAGE ! You found out its <span class="uppercase underline">Category {category}</span></p>
         {/if}
     </div>
 {/snippet}
 
-<div class="card preset-filled-surface-500 max-w-[50%] max-h-[100%]">
+<div class="card preset-filled-surface-500 max-w-[80%]">
     {#if !votingStage}
         {#if currentTurn>-1}
             <div class="text-center items-center justify-center flex flex-col">
                 {#if currentTurn!=imposter}
                     {@render envelope(group[currentTurn].name,wordslist[category][word],categories[category])}
                 {:else}
-                    {@render mission(group[currentTurn].name,"Try to find the secret word",null)}
+                    {@render mission(group[currentTurn].name,"Try to find the secret word",data.mode=='normal'?null:categories[category])}
                 {/if}
-                <button class="btn preset-filled-primary-50-950" onclick={nextTurn}>Click</button>
+                {#if data.mode=='normal'}
+                    <button class="btn preset-filled-primary-50-950" onclick={nextTurn}>Next</button>
+                {:else}
+                    <p>SABOTAGE ! You have {timeLim} seconds left</p>
+                {/if}
+                
             </div>
         {/if}
     {:else}
@@ -316,9 +340,10 @@
                     <button class="btn preset-filled-error-200-800" onclick={()=>personVoted(i)}>Vote</button>
                 </div>
             {/each}
+            <button class="btn preset-filled-success-500 mt-4"  onclick={()=>{personVoted(0)}}>Spy figured it out</button> <!--This is kind of hacky because i "know" the first person is never the spy-->
         </div>
     {/if}
 </div>
-{#if urlDone}
+{#if urlDone && data.mode=='normal'}
     <iframe class=" m-2 w-[100vw] h-[50vh] {(currentTurn==imposter)||(votingStage==true)||(showHint==false) ? 'hidden':''}" src={url[0]+url[1]+url[2]}></iframe>
 {/if}
