@@ -5,6 +5,8 @@
 	import { useTTS } from '$lib/logic/voice';
 	import type { team } from '$lib/types/teamTypes';
 	import { online } from 'svelte/reactivity/window';
+    import {wordCategories,words} from '$lib/types/categories'
+	import { Dialog, Portal } from '@skeletonlabs/skeleton-svelte';
 
     let {data}:PageProps = $props();
     let group:team;    
@@ -162,8 +164,12 @@
     let imposter:number=$state(-1);
     let category:number=$state(-1);
     let word:number=$state(-1);
-    let votingStage = $state(false);
+    let wordArray:number =0;
+    let stage = $state(0);
+    let throwAways = $state<Set<number>>(new Set([]));
     let order=[];
+    let targetEL:HTMLElement|null = $state(null);
+    let openModal = $state(true);
 
     $inspect(imposter);
     $inspect(category);
@@ -177,9 +183,9 @@
         }
         
 
-        category = Math.floor(Math.random() * categories.length);
-        word = Math.floor(Math.random() * wordslist[category].length);
-
+        category = Math.floor(Math.random() * wordCategories.length);
+        wordArray = Math.floor(Math.random() * words[category].length);
+        word = Math.floor(Math.random() * words[category][wordArray].length);
         
         imposter = Math.floor(Math.random() * data.group.length);
         //get a snapshot of the data to manipulate
@@ -187,6 +193,13 @@
         temp.sort((a,b)=>b.impostor-a.impostor);
         if( (data.group[imposter].impostor - temp[temp.length-1].impostor) > Math.floor(Math.random()*3+2)){
             imposter = data.group.findIndex((player)=>player.name==temp[temp.length-1].name);
+        }
+
+        if(data.mode=='sabotage'){
+            throwAways.add(word);
+            for (;throwAways.size<5;){
+                throwAways.add(Math.floor(Math.random() * words[category][wordArray].length));
+            }
         }
 
 
@@ -209,6 +222,9 @@
     useTTS("Everyone close your eyes and wait",data.rate,data.pitch);
     if(data.mode=='sabotage'){
         useTTS("The spy has done sabotage",data.rate,data.pitch);
+    }
+    if(data.mode=='espionage'){
+        useTTS("The spy has done espionage",data.rate,data.pitch);
     }
     
     
@@ -253,7 +269,7 @@
         setTimeout(()=>{
             showHint=false;
             if(currentTurn==group.length-1){
-                votingStage=true;
+                stage=1;
                 useTTS(`Open your eyes everyone`,data.rate,data.pitch);
                 return;
             }
@@ -282,24 +298,69 @@
     let showHint = $state(false);
     (()=>{
         if(data.mode!='normal') return;
-        let curWord = wordslist[category][word];
+        let curWord = words[category][wordArray][word];
         url[1] = "&q="+encodeURIComponent(curWord);
         if(online.current){
             urlDone=true
         }
     })();
 
+    const cellModes = {
+        normal : "bg-surface-400",
+        colored : "bg-primary-600-400/70",
+        known : "bg-success-300-700",
+        throaway : "bg-secondary-200-800 underline"
+    }
 </script>
 
-{#snippet envelope(name:string,word:string,category:string)}
-    <div class="card preset-filled-primary-300-700 p-4 m-2">
-        <p>For {name}'s eyes only</p>
-        <p>You are not the spy.</p>
-        <p class="h4 uppercase">{word}</p>
-        <p class="caption-bottom">Category {category}</p>
-        <button class={`btn preset-tonal-secondary ${showHint==true ||data.mode!='normal' || !online.current ? 'hidden' : ''}`} onclick={()=>{showHint=true;}}>Show hint</button>
+{#snippet cell(word:string,mode:string)}
+
+    <span class={[
+                mode,
+                "text-center justify-center flex flex-col col-span-1"
+            ]}>{word.toLocaleLowerCase()}</span>
+{/snippet}
+
+{#snippet wordcard(words:string[],word:number,spy:boolean,throwAways:Set<number>)}
+    <div class="card preset-filled-surface-300-700 grid-cols-2 grid w-full h-full md:grid-cols-4 lg:w-[30dvw] lg:h-[40dvh]">
+        {#each words as singleWord,index}
+            {@const colorit=(index%2)===(Math.floor(index/4)%2)}
+            {#if spy && throwAways && throwAways.has(index)}
+                {@render cell(singleWord,cellModes.throaway)}
+            {:else if !spy && index==word}
+                {@render cell(singleWord,cellModes.known)}
+            {:else}
+                {@render cell(singleWord,colorit ? cellModes.colored : cellModes.normal)}
+            {/if}
+            
+        {/each}
     </div>
 {/snippet}
+
+
+{#snippet envelope(name:string,spy:boolean,mission:string|null)}
+    <div class={["card p-4 m-2",spy ? 'preset-filled-error-300-700':'preset-filled-primary-300-700']}>
+        <p>For {name}'s eyes only</p>
+        {#if spy}
+            <p>You are the spy.</p>
+        {:else}
+            <p>You are not the spy.</p>
+        {/if}
+        
+        {#if spy && data.mode=='counter_int'}
+            The enemies counter intelligence blocked you from looking at the words
+        {:else}
+            {@render wordcard(words[category][wordArray],word,spy,throwAways)}
+        {/if}
+        <p class="caption-bottom">Category {wordCategories[category]}</p>
+        {#if !spy}
+            <button class={[`btn preset-tonal-secondary`,(showHint==true ||data.mode!='normal' || !online.current) && 'hidden']} onclick={()=>{showHint=true;}}>Show hint</button>
+        {/if}
+        
+    </div>
+{/snippet}
+<!-- -->
+
 
 
 {#snippet mission(name:string,mission:string,category:string|null)}
@@ -313,16 +374,16 @@
     </div>
 {/snippet}
 
-<div class="card preset-filled-surface-500 max-w-[80%]">
-    {#if !votingStage}
+<div class="card preset-filled-surface-500 max-w-[80%] p-2">
+    {#if stage==0}
         {#if currentTurn>-1}
             <div class="text-center items-center justify-center flex flex-col">
                 {#if currentTurn!=imposter}
-                    {@render envelope(group[currentTurn].name,wordslist[category][word],categories[category])}
+                    {@render envelope(group[currentTurn].name,false,'a')}
                 {:else}
-                    {@render mission(group[currentTurn].name,"Try to find the secret word",data.mode=='normal'?null:categories[category])}
+                    {@render envelope(group[currentTurn].name,true,'a')}
                 {/if}
-                {#if data.mode=='normal'}
+                {#if ['normal','counter_int'].includes(data.mode)}
                     <button class="btn preset-filled-primary-50-950" onclick={nextTurn}>Next</button>
                 {:else}
                     <p>SABOTAGE ! You have {timeLim} seconds left</p>
@@ -330,20 +391,51 @@
                 
             </div>
         {/if}
-    {:else}
+    {:else if stage==2}
         <div class="card preset-outlined-primary-300-700 p-3 text-center">
-            <p>In this order say hint</p>
-            <p>Try to find the spy before the spy figures it out</p>
+            <h3 class='h3'>Who is the spy ?</h3>
             {#each order as name,i}
-                <div>
-                    <p class="h4">{name}</p>
-                    <button class="btn preset-filled-error-200-800" onclick={()=>personVoted(i)}>Vote</button>
+                <div class="m-1">
+                    <button class="btn preset-filled-error-200-800" onclick={()=>personVoted(i)}>{name} is the spy</button>
                 </div>
             {/each}
             <button class="btn preset-filled-success-500 mt-4"  onclick={()=>{personVoted(0)}}>Spy figured it out</button> <!--This is kind of hacky because i "know" the first person is never the spy-->
         </div>
+    {:else}
+        {@render wordcard(words[category][wordArray],-1,false,throwAways)}
+        <div bind:this={targetEL}></div>
+        <Dialog open={openModal} modal={true} onOpenChange={(e)=>{openModal=e.open}}>
+            
+            <Portal target={targetEL}>
+                <Dialog.Backdrop class="fixed inset-0 z-50 bg-surface-50-950/50" />
+                <Dialog.Positioner class="fixed inset-0 z-50 flex justify-center items-center p-4">
+                    <Dialog.Content class="card bg-surface-800 w-[80%] h-[60dvh] max-w-xl max-h-xl p-4 space-y-4 shadow-xl">
+                        <header class="flex justify-between items-center">
+                            <Dialog.Title class="text-lg font-bold">Hello players</Dialog.Title>
+                            <Dialog.CloseTrigger class="btn preset-outlined-error-500 hover:preset-tonal">
+                                X
+                            </Dialog.CloseTrigger>
+                        </header>
+                        <Dialog.Description class=" max-h-[70%] overflow-y-auto">
+                            In this order start giving hints
+                            {#each order as name,i}
+                                
+                                <p class="h4">{name}</p>
+                                
+                            {/each}
+                        </Dialog.Description>
+                    </Dialog.Content>
+                </Dialog.Positioner>
+            </Portal>
+        </Dialog>
+
+        <div class="flex flex-col mt-2 sm:flex-row">
+            <button class="btn preset-filled-secondary-500 self-center" onclick={()=>{openModal=true}}>Remind order</button>
+            <button class="btn preset-filled-primary-500 self-center" onclick={()=>{stage=2}}>To Voting</button>
+        </div>
+        
     {/if}
 </div>
 {#if urlDone && data.mode=='normal'}
-    <iframe class=" m-2 w-[100vw] h-[50vh] {(currentTurn==imposter)||(votingStage==true)||(showHint==false) ? 'hidden':''}" src={url[0]+url[1]+url[2]}></iframe>
+    <iframe class=" m-2 w-[100vw] h-[50vh] {(currentTurn==imposter)||(stage>0)||(showHint==false) ? 'hidden':''}" src={url[0]+url[1]+url[2]}></iframe>
 {/if}

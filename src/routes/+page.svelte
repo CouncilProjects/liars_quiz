@@ -21,6 +21,18 @@
             entryPoint:"/fake-out",
             underConst:false,
             descr:"In this game all the players except one get a word the secret,and one player is the 'SPY', then each round each player says a word that describes the secret, the 'SPY' wins if he figures out the secret while the players win if they find the 'SPY'."
+        },
+        {
+            gameName:"Same but different",
+            entryPoint:"/same-different",
+            underConst:true,
+            descr:"In this game there are no lies. Every round a player is chosen to become the judge. The other players get a prompt, with 2 different scenarios that will need the same answer. After all have written their answers the judge picks the one he likes best."
+        },
+        {
+            gameName:"Intersecting meaning",
+            entryPoint:"/intersect",
+            underConst:true,
+            descr:"In this game every round a judge is chosen, the players get 2 scenarios in an intersecting venn diagram, and they have to find something common. The judge picks his favorite answer and that player gets a point."
         }
     ]
 </script>
