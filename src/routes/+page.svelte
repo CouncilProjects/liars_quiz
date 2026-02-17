@@ -5,9 +5,10 @@
 
     type gameType={
         gameName:string,
-            entryPoint:string,
-            underConst:boolean,
-            descr:string
+        entryPoint:string,
+        underConst:boolean,
+        descr:string
+        nsfw?:boolean
     }
     const listOfGames:gameType[]=[
         {
@@ -23,10 +24,11 @@
             descr:"In this game all the players except one get a word the secret,and one player is the 'SPY', then each round each player says a word that describes the secret, the 'SPY' wins if he figures out the secret while the players win if they find the 'SPY'."
         },
         {
-            gameName:"Same but different",
-            entryPoint:"/same-different",
-            underConst:true,
-            descr:"In this game there are no lies. Every round a player is chosen to become the judge. The other players get a prompt, with 2 different scenarios that will need the same answer. After all have written their answers the judge picks the one he likes best."
+            gameName:"Say That Again ?",
+            entryPoint:"/say-again",
+            underConst:false,
+            descr:"In this game there are no lies. Every round a player is chosen to become the judge. The other players get a prompt, with 2 different scenarios, they will need to respond to both with 1 answer. After all have written their answers the judge picks the one he likes best.",
+            nsfw:true,
         },
         {
             gameName:"Intersecting meaning",
@@ -38,14 +40,14 @@
 </script>
 
 
-{#snippet description(gameName: string, desc: string)}
+{#snippet description(gameName: string, desc: string,nsfw:boolean=false)}
     {#if showDescriptions}
         <div
             in:fade={{duration:1500}}
             out:fade={{duration:500}}
             class="text-surface-contrast-700-300
                    flex flex-col text-center -mt-3
-                   w-full max-w-md mx-auto p-4 mr-4 ml-4"
+                   w-full max-w-md mx-auto p-4 sm:mr-4 sm:ml-4"
         >
             <span class="h6 mb-2">
                 Description for {gameName}
@@ -57,22 +59,31 @@
             >
                 {desc}
             </span>
+            {#if nsfw}
+                <span class="bg-red-500">
+                    This game contains adult theme elements so its not advised to be played with minors.
+                </span>
+            {/if}
         </div>
     {/if}
 {/snippet}
 
-{#snippet game(gameName:string,underConst:boolean,entryPoint:string,descr:string="")}
+{#snippet game(gameName:string,underConst:boolean,entryPoint:string,descr:string="",nsfw:boolean=false)}
     <button class="card {underConst?'cursor-auto':''} preset-filled-surface-700-300 text-surface-contrast-700-300 {underConst?'':'hover:shadow-amber-500 hover:shadow-2xs'} m-4 p-2 flex flex-col text-center" 
-        onclick={()=>{goto(entryPoint);}}
+        onclick={()=>{if(!underConst) goto(entryPoint);}}
     >
         <span class="h6">Play the game : </span>
         <span class="font-bold h4 uppercase text-primary-contrast-600-400">{gameName}</span>
+        
         {#if underConst}
             <span class="text-warning-500 caption">🚧 Under construction 🚧</span>
         {:else}
             <span>Click to play</span>
+            {#if nsfw}
+                <span class="uppercase text-red-500">+18 !</span>
+            {/if}
         {/if}
-        {@render description(gameName,descr)}
+        {@render description(gameName,descr,nsfw)}
         
     </button>
 {/snippet}
@@ -83,6 +94,6 @@
 <button class="btn preset-outlined-primary-500 mb-2" onclick={()=>{showDescriptions=!showDescriptions}}>{showDescriptions?"Hide":"Show"} Descriptions</button>
 <div class="card preset-filled-surface-600-400 justify-center items-center flex flex-col">
     {#each listOfGames as onegame:gameType}
-        {@render game(onegame.gameName,onegame.underConst,onegame.entryPoint,onegame.descr)}
+        {@render game(onegame.gameName,onegame.underConst,onegame.entryPoint,onegame.descr,onegame.nsfw)}
     {/each}
 </div>
