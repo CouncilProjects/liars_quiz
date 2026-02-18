@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
-	import type { team } from '$lib/types/teamTypes';
+	import type { impostorTeamEntry, team } from '$lib/types/teamTypes';
     import type { PageProps } from './$types';
     import {safeCards,riskyCards} from '$lib/types/same-different-scenarios';
 	import { Progress } from '@skeletonlabs/skeleton-svelte';
@@ -15,11 +15,11 @@
     let recordedAns = $state<string[]>([]);
     let input = $state('');
     $inspect(gameState);
-    let group:team = [];
+    let group:impostorTeamEntry[] = [];
     if(!data.teamData){
         goto("/fake-out");
     } else {
-        group = data.teamData as team;
+        group = data.teamData as impostorTeamEntry[];
     }
     
     (()=>{
@@ -28,7 +28,7 @@
         console.log(gameState.judge);
         console.log(group[gameState.judge]);
         let tempArr = group;
-        tempArr.sort((a,b)=>{return a.impostor - b.impostor})
+        tempArr.sort((a,b)=>{return b.impostor - a.impostor})
         //make sure one person does not become the judge too many times. 
         if(group[gameState.judge].impostor-tempArr[tempArr.length-1].impostor>3){
             gameState.judge=group.findIndex((elem)=>elem.name==tempArr[tempArr.length-1].name);

@@ -31,6 +31,12 @@
             nsfw:true,
         },
         {
+            gameName:"Shady truths",
+            entryPoint:"/shady-truth",
+            underConst:false,
+            descr:"In this game, One player is the guesser, one is the truth teller and the rest are the red herrings. To a question the truth teller says the correct answer everyone else says a lie.Goals: The guesser needs to find all the liars, while the truth teller needs to try to make himself look like the liar. The liars need to be not found."
+        },
+        {
             gameName:"Intersecting meaning",
             entryPoint:"/intersect",
             underConst:true,

@@ -2,7 +2,7 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
     import { page } from '$app/state';
-    import {type team,type entry} from "$lib/types/teamTypes.js"
+    import {type team,type entry, addEntryFunctionLookup} from "$lib/types/teamTypes.js"
     import {ChevronDown,ChevronUp} from "@lucide/svelte"
 	import type { PageProps } from './$types';
 	const id = $derived(page.params.groupId);
@@ -10,7 +10,7 @@
     const isSmall=$derived(window.innerWidth<640);
     let people:team = $state([]);
     $inspect(people);
-    let form:entry=$state({name:'',score:0,impostor:0});
+    let form:entry=$state({name:'',score:0});
     let formErrors = $state('');
 
     let {params,data}:PageProps = $props();
@@ -38,11 +38,10 @@
             },2000);
         }
         else {
-            people.push({name:form.name,score:form.score,impostor:form.impostor});
+            people.push(addEntryFunctionLookup[params.game](form.name,form.score));
         }
         form.name='';
         form.score=0;
-        form.impostor=0;
     }
 
     const remove=(removes:string)=>{
