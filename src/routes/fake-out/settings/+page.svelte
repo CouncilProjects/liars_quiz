@@ -88,7 +88,7 @@
 	<div class="flex flex-col space-y-3 card preset-filled-surface-300-700 p-2">
         <h6 class="h6 self-center">Mode selection</h6>
 
-        <Combobox class="max-w-md" placeholder="Search..." defaultInputValue={mode} {collection} {onOpenChange} {onInputValueChange} {onValueChange}>
+        <Combobox class="max-w-md" placeholder="Search..." defaultInputValue={data.find((e)=>e.value==mode)?.label} {collection} {onOpenChange} {onInputValueChange} {onValueChange}>
             <Combobox.Label>Label</Combobox.Label>
             <Combobox.Control>
                 <Combobox.Input />
@@ -107,35 +107,7 @@
                 </Combobox.Positioner>
             </Portal>
         </Combobox>
-        <!--
-		<Switch checked={checked} 
-            onCheckedChange={
-                    ()=>{
-                        checked=!checked;
-                        checked?mode="sabotage":mode="normal";
-                        changes=true;
-                    }
-                }>
-			<Switch.Control class="data-[state=checked]:preset-filled-success-500">
-				<Switch.Thumb />
-			</Switch.Control>
-            <Switch.Label>
-                <Tooltip>
-                    <Tooltip.Trigger>{mode}</Tooltip.Trigger>
-                    <Portal>
-                        <Tooltip.Positioner>
-                        <Tooltip.Content class="card max-w-md p-2 bg-surface-100-900 shadow-xl">
-                            {
-                                descriptions[mode]
-                            }
-                        </Tooltip.Content>
-                        </Tooltip.Positioner>
-                    </Portal>
-                </Tooltip>
-            </Switch.Label>
-			<Switch.HiddenInput />
-		</Switch>-->
-        <p class="text-center">{descriptions[mode]}</p>
+        <p class="text-center">{descriptions[mode as keyof typeof descriptions]}</p>
 	</div>
 
 	<div class="flex flex-col space-y-3 card preset-filled-surface-300-700 p-2 w-full">
