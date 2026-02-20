@@ -4,6 +4,7 @@
     import type { PageProps } from './$types';
     import {safeCards,riskyCards} from '$lib/types/same-different-scenarios';
 	import { Progress } from '@skeletonlabs/skeleton-svelte';
+	import { pickRoles } from '$lib/logic/assignRoles';
 	let { data,params }: PageProps = $props();
     const stages = {
         Showing: 1,
@@ -24,15 +25,10 @@
     
     (()=>{
 
-        gameState.judge = Math.floor(Math.random()*(group.length-1));
-        console.log(gameState.judge);
-        console.log(group[gameState.judge]);
+        
         let tempArr = group;
-        tempArr.sort((a,b)=>{return b.impostor - a.impostor})
-        //make sure one person does not become the judge too many times. 
-        if(group[gameState.judge].impostor-tempArr[tempArr.length-1].impostor>3){
-            gameState.judge=group.findIndex((elem)=>elem.name==tempArr[tempArr.length-1].name);
-        }
+        const role = pickRoles(tempArr,['impostor'],5);
+        gameState.judge=role[0];
 
         gameState.safe = Math.floor(Math.random()*(safeCards.length-1));
         gameState.risky = Math.floor(Math.random()*(riskyCards.length-1));
@@ -119,7 +115,7 @@
                 <hr class="hr my-1" />
                 <div class="flex text-center flex-col mt-2">
                     <p>{group[index].name} says</p>
-                    <p class="m-1 border-2 font-bold max-w-[100%] text-wrap">{playerAns}</p>
+                    <p class="m-1 border-2 font-bold max-w-full text-wrap">{playerAns}</p>
                     <button class="btn preset-tonal-primary" onclick={()=>{voted(index);}}>Vote as best</button>
                 </div>
             {/if}

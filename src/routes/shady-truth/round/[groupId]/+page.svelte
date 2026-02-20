@@ -7,6 +7,7 @@
     import { Fish } from '@lucide/svelte';
     import { CircleQuestionMark } from '@lucide/svelte';
     import { UserRoundSearch } from '@lucide/svelte';
+	import { pickRoles } from '$lib/logic/assignRoles';
 
     const stages = {
         LOADING:-1,
@@ -40,30 +41,12 @@
 
     (()=>{
         gameState.question = Math.floor(Math.random()*(triviaQuestions.length-1));
-        gameState.guesser = Math.floor(Math.random()*(group.length-1));
-        let temp;
-        do {
-            temp = Math.floor(Math.random()*(group.length-1));
-        } while (temp==gameState.guesser);
-        gameState.truthTeller = temp;
+        let temp = $state.snapshot(data.teams);
 
-
-        let tempArr = [...group];
-        tempArr.sort((a,b)=>{return b.guesser - a.guesser})
-        // make sure one person does not become the guesser too many times. 
-        if(group[gameState.guesser].guesser - tempArr[tempArr.length-1].guesser > 3)
-        {
-            gameState.guesser = group.findIndex((elem)=> elem.name == tempArr[tempArr.length-1].name);
-        }
+        const role = pickRoles(temp,['guesser','truthTeller'],5);
+        gameState.guesser = role[0];
+        gameState.truthTeller=role[1];
         
-        tempArr = tempArr.filter((elem)=>elem.name!=group[gameState.guesser].name);
-
-        tempArr.sort((a,b)=>{return b.truthTeller - a.truthTeller})
-        // make sure one person does not become the guesser too many times. 
-        if(group[gameState.truthTeller].truthTeller - tempArr[tempArr.length-1].truthTeller > 3)
-        {
-            gameState.truthTeller = group.findIndex((elem)=> elem.name == tempArr[tempArr.length-1].name);
-        }
         
         let ind=[];
         for (let i = 0; i < group.length; i++) {

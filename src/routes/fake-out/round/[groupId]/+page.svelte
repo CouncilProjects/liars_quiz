@@ -7,6 +7,7 @@
 	import { online } from 'svelte/reactivity/window';
     import {wordCategories,words} from '$lib/types/categories'
 	import { Dialog, Portal } from '@skeletonlabs/skeleton-svelte';
+	import { pickRoles } from '$lib/logic/assignRoles';
 
     let {data}:PageProps = $props();
     let group:team;    
@@ -187,13 +188,10 @@
         wordArray = Math.floor(Math.random() * words[category].length);
         word = Math.floor(Math.random() * words[category][wordArray].length);
         
-        imposter = Math.floor(Math.random() * data.group.length);
-        //get a snapshot of the data to manipulate
-        let temp = $state.snapshot(data.group);
-        temp.sort((a,b)=>b.impostor-a.impostor);
-        if( (data.group[imposter].impostor - temp[temp.length-1].impostor) > Math.floor(Math.random()*3+2)){
-            imposter = data.group.findIndex((player)=>player.name==temp[temp.length-1].name);
-        }
+        const temp = $state.snapshot(data.group);
+
+        const role = pickRoles(temp,['impostor'],5);
+        imposter=role[0];
 
         if(data.mode=='sabotage'){
             throwAways.add(word);
@@ -437,5 +435,5 @@
     {/if}
 </div>
 {#if urlDone && data.mode=='normal'}
-    <iframe class=" m-2 w-[100vw] h-[50vh] {(currentTurn==imposter)||(stage>0)||(showHint==false) ? 'hidden':''}" src={url[0]+url[1]+url[2]}></iframe>
+    <iframe class=" m-2 w-screen h-[50vh] {(currentTurn==imposter)||(stage>0)||(showHint==false) ? 'hidden':''}" src={url[0]+url[1]+url[2]}></iframe>
 {/if}

@@ -12,6 +12,8 @@ const self = globalThis.self as unknown as ServiceWorkerGlobalScope;
 
 const CACHE = `liars-quiz-${version}`;
 
+const swConfig = `liarsQuiz-installed`;
+
 const ASSETS = [
     ...build,
     ...files,
@@ -29,30 +31,41 @@ self.addEventListener('install', () => {
 
 
 // delete old cashes
-self.addEventListener('activate', async (event) => {
+self.addEventListener('activate', (event) => {
     console.log('[SW] Activating version:', version);
-    console.log('[SERVICE-WORKER] Claiming clients');
-    await self.clients.claim();
-    async function deleteOldCache(){
-        let newRequired = false;
-        const cachesNames = await caches.keys;
 
-        for(const singlecache in cachesNames){
-            if(singlecache!=CACHE && singlecache.includes("liars-quiz")){
-                console.log('[SERVICE-WORKER] Deleting old cache:', name);
-                await caches.delete(name);
-                newRequired=true; //if there is a previous chach then i am propable installed
+    event.waitUntil((async () => {
+        await self.clients.claim();
+
+        // Optional: if you want to recreate cache on activation
+        const config = await caches.open(swConfig);
+        const offlineOK = await config.match('installed');
+        if (offlineOK) {
+            await addFilesToCache();
+            const clients = await self.clients.matchAll({
+                type: "window",
+                includeUncontrolled: true
+            });
+
+            for (const client of clients) {
+                client.postMessage({
+                    type: "new-update",
+                    version
+                });
             }
         }
 
-        if(newRequired){
-            await addFilesToCache();
+        const cacheNames = await caches.keys();
+
+        for (const cacheName of cacheNames) {
+            if (cacheName !== CACHE && cacheName.includes('liars-quiz')) {
+                console.log('[SW] Deleting old cache:', cacheName);
+                await caches.delete(cacheName);
+            }
         }
-
-    }
-
-    deleteOldCache();
+    })());
 });
+
 
 async function addFilesToCache() {
     const cache = await caches.open(CACHE);
@@ -66,17 +79,29 @@ async function addFilesToCache() {
 
 self.addEventListener('message',(event)=>{
     if(event.data?.type=="Install PWA"){
-        event.waitUntil(
-            addFilesToCache()
-                .then(() => {
-                    console.log("[SERVICE-WORKER]: Completed");
-                })
-        );
+        event.waitUntil((async ()=>{
+            await addFilesToCache();
+            console.log("Files cashed");
+            const config = await caches.open(swConfig);
+            await config.put('installed',new Response('true'));
+            console.log("DONE");
+
+            const clients = await self.clients.matchAll({
+                type: "window",
+                includeUncontrolled: true
+            });
+
+            for (const client of clients) {
+                client.postMessage({
+                    type: "installed",
+                    version
+                });
+            }
+        })());
     }
 
     if(event.data.type=="As PWA"){
         console.log("Running PWA");
-        pwa=true;
     }
 })
 

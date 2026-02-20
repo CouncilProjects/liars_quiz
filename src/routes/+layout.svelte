@@ -3,10 +3,15 @@
   import LightSwitch from '$lib/components/LightSwitch.svelte';
   import { onMount } from 'svelte';
   import { browser } from '$app/environment';
+  	import { page } from '$app/state';
+	import { Toast,createToaster } from '@skeletonlabs/skeleton-svelte';
 
   let { children } = $props();
   let installable = $state(false);
   let installPrompt:any|null=null;
+  let updateToast = $state(false);
+
+  const toaster = createToaster({placement:'top'});
 
   function  registerSW() {
     if(browser && 'serviceWorker' in navigator){
@@ -33,12 +38,22 @@
     console.log("[LOG] SW notified to act like a PWA.");
   }
 
+
   //register SW
   onMount(()=>{
     registerSW();
     if(isRunningAsPWA()){
       notifySWRunPWA();
     }
+    navigator.serviceWorker.addEventListener('message',(event)=>{
+      if(event.data?.type=="new-update"){
+        toaster.info({title:'Update successfull',description:"You have recieved a new update"});
+      }
+
+      if(event.data?.type=="installed"){
+        toaster.success({title:'Install complete',description:"You have recieved the app"});
+      }
+    })
   })
 
   
@@ -81,14 +96,27 @@ onappinstalled={()=>{removeInstallButton();notifySWForInstall();}}
 	<link rel="manifest" href="/manifest.webmanifest">
 </svelte:head>
 
-<div class="flex flex-row w-full">
-<LightSwitch></LightSwitch>
-<button class="btn preset-filled-primary-300-700 ml-auto" hidden={installable==false} onclick={installPressed}>Install</button>
-</div>
+{#if page.url.pathname.match("/") || ['general','settings'].some(part=>page.url.pathname.includes(part))}
+  <div class="flex flex-row w-full">
+    <LightSwitch></LightSwitch>
+    <button class="btn preset-filled-primary-300-700 ml-auto" hidden={installable==false} onclick={installPressed}>Install</button>
+  </div>
 
+{/if}
 
 <div class="w-full h-full m-0 p-4 flex flex-col justify-center items-center">
 {@render children?.()}
 
 </div>
 
+<Toast.Group {toaster}>
+	{#snippet children(toast)}
+		<Toast toast={toast}>
+			<Toast.Message>
+			<Toast.Title>{toast.title}</Toast.Title>
+			<Toast.Description>{toast.description}</Toast.Description>
+			</Toast.Message>
+			<Toast.CloseTrigger />
+		</Toast>
+	{/snippet}
+</Toast.Group>

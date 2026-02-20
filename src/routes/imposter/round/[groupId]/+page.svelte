@@ -4,6 +4,7 @@
 	import AnswerCard from './AnswerCard.svelte';
 	import VotingStage from './VotingStage.svelte';
     import {useTTS} from '$lib/logic/voice'
+	import { pickRoles } from '$lib/logic/assignRoles';
 	let { data }:PageProps = $props();
 
     $inspect(data.mode);
@@ -461,14 +462,11 @@
             imposterQuestion= Math.floor(Math.random() * questions[type].length); //find imposter question
         }
 
-        imposter= Math.floor(Math.random() * (data.group?.length||0)); //find random impostor
+        
        
         const temp=$state.snapshot(data.group!); //get a snapshot of the team 
-        temp.sort((a,b)=>b.impostor-a.impostor); //sort based on times each were an impostor
-        
-        if(data.group![imposter].impostor-temp[temp?.length-1].impostor>=Math.floor(Math.random()*3+2)){ //if the chosen person was the impostor 2 times more than the least picked person pick the last one.
-            imposter = data.group!.findIndex((elem)=>elem.name==temp[temp?.length-1].name);
-        }
+        const role = pickRoles(temp,['impostor'],5);
+        imposter=role[0];
         
         // give time before starting for all to close their eyes
         setTimeout(() => {

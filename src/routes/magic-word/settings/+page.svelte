@@ -1,10 +1,9 @@
 <script lang="ts">
 	import { Combobox, Portal, Slider, Switch, Tooltip, useListCollection, type ComboboxRootProps } from "@skeletonlabs/skeleton-svelte";
-    const defaulting={mode:'normal',synth:{rate:1,pitch:1},customWords:false,timeLimit:240,maxQuestions:50}
+    import {defaulting} from './defaultsettings';
     
 	const synth = window.speechSynthesis;
 	let ready = $state(false);
-    let changes=$state(false);
     let originalState=$state(defaulting); //needed for the dirty checking. 
     let settingsState = $state(defaulting);
 
