@@ -256,15 +256,15 @@
             {#if roleAssignmentState.viewing+1<data.team.length}
                 <div class="card preset-filled-surface-400-600">
                     <p>Press the button bellow to hide your role and pass the phone to {data.team[roleAssignmentState.viewing+1].name}</p>
-                <button class="btn preset-tonal-primary" onclick={()=>{roleAssignmentState.hidden=true; roleAssignmentState.viewing++;}}>Hide role</button>
+                <button class="btn preset-tonal-primary m-1" onclick={()=>{roleAssignmentState.hidden=true; roleAssignmentState.viewing++;}}>Hide role</button>
                 </div>
             {:else}
                 <p>Now that everyone has seen their role place the phone on the table and start the selection</p>
-                <button onclick={()=>{gameState.stage=stages.WORD_PICK; progressWordSelect();}}>Start selection</button>
+                <button class="btn preset-filled-primary-500 m-2" onclick={()=>{gameState.stage=stages.WORD_PICK; progressWordSelect();}}>Start selection</button>
             {/if}
             
         {:else}
-            <button class="btn preset-tonal-primary text-wrap wrap-break-word" onclick={()=>{roleAssignmentState.hidden=false}}>Press to reveal your role.</button>
+            <button class="btn preset-tonal-primary text-wrap wrap-break-word m-2" onclick={()=>{roleAssignmentState.hidden=false}}>Press to reveal your role.</button>
             
         {/if}
     </div>

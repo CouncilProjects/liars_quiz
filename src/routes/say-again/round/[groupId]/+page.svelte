@@ -26,7 +26,7 @@
     (()=>{
 
         
-        let tempArr = group;
+        let tempArr = [...group];
         const role = pickRoles(tempArr,['impostor'],5);
         gameState.judge=role[0];
 

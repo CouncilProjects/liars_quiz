@@ -3,8 +3,9 @@
 	import { goto } from '$app/navigation';
     import { page } from '$app/state';
     import {type team,type entry, addEntryFunctionLookup} from "$lib/types/teamTypes.js"
-    import {ChevronDown,ChevronUp} from "@lucide/svelte"
+    import {ChevronDown,ChevronUp, XIcon} from "@lucide/svelte"
 	import type { PageProps } from './$types';
+	import { Dialog, Portal } from '@skeletonlabs/skeleton-svelte';
 	const id = $derived(page.params.groupId);
     const game = $derived(page.params.game);
     const isSmall=$derived(window.innerWidth<640);
@@ -98,9 +99,33 @@
             </label>
             
         </span>
-        <span class="flex flex-row self-center space-x-3">
-            <button class="btn preset-filled-warning-400-600 self-center" onclick={()=>{people=[];}}>Clear All</button>
-        <button class="btn preset-filled-success-400-600 self-center" onclick={save}>Save</button>
+        <span class="flex flex-col md:flex-row *:mt-1 self-center space-x-3">
+            <Dialog>
+                <Dialog.Trigger class="btn preset-filled-error-400-600 self-center">Delete players</Dialog.Trigger>
+                <Portal>
+                    <Dialog.Backdrop class="fixed inset-0 z-50 bg-surface-50-950/50" />
+                    <Dialog.Positioner class="fixed inset-0 z-50 flex justify-center items-center p-4">
+                        <Dialog.Content class="card bg-surface-100-900 w-full max-w-xl p-4 space-y-4 shadow-xl">
+                            <header class="flex justify-between items-center">
+                                <Dialog.Title class="text-lg font-bold text-error-200-800">Warning</Dialog.Title>
+                                <Dialog.CloseTrigger class="btn-icon hover:preset-tonal">
+                                    <XIcon class="size-4" />
+                                </Dialog.CloseTrigger>
+                            </header>
+                            <Dialog.Description>
+                                This will delete all players
+                            </Dialog.Description>
+                            <footer class="flex justify-end gap-2">
+                                <Dialog.CloseTrigger class="btn preset-tonal">Cancel</Dialog.CloseTrigger>
+                                <Dialog.CloseTrigger onclick={()=>{people=[];}} class="btn preset-filled text-red-500">Delete</Dialog.CloseTrigger>
+                            </footer>
+                        </Dialog.Content>
+                    </Dialog.Positioner>
+                </Portal>
+            </Dialog>
+            
+            <button class="btn preset-filled-warning-400-600 self-center" onclick={()=>{people.forEach((per)=>{per.score=0})}}>Clear All scores</button>
+            <button class="btn preset-filled-success-400-600 self-center" onclick={save}>Save</button>
         </span>
     
 </div>

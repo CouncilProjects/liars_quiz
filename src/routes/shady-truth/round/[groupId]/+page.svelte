@@ -162,7 +162,7 @@
 {:else if gameState.stage==stages.ANSWERING}
     <div class="card preset-filled-surface-400-600 flex flex-col text-center justify-center items-center">
         <p class="underline decoration-red-500 font-bold">For non guesser eyes only</p>
-        <p class="h6">The truth teller for this round is <span class="text-primary-700-300 font-bold h5">{group[gameState.truthTeller].name}</span></p>
+        <p class="h6">The truth teller for this round is <span class="text-green-400 dark:text-green-600 font-bold h5">{group[gameState.truthTeller].name}</span></p>
         Question
         <p class="h5">{triviaQuestions[gameState.question][0]}</p>
         Answer

@@ -5,6 +5,7 @@
   import { browser } from '$app/environment';
   	import { page } from '$app/state';
 	import { Toast,createToaster } from '@skeletonlabs/skeleton-svelte';
+	import { goto } from '$app/navigation';
 
   let { children } = $props();
   let installable = $state(false);
@@ -14,6 +15,7 @@
   const toaster = createToaster({placement:'top'});
 
   function  registerSW() {
+    //this practically goes and sees if there is a SW if there is a new SW it downloads it and then installs it. 
     if(browser && 'serviceWorker' in navigator){
       //register sw
       navigator.serviceWorker
@@ -47,7 +49,11 @@
     }
     navigator.serviceWorker.addEventListener('message',(event)=>{
       if(event.data?.type=="new-update"){
-        toaster.info({title:'Update successfull',description:"You have recieved a new update"});
+        toaster.info({ title: 'Update available', description: 'Refreshing to latest version...' });
+          setTimeout(() => {
+          window.location.href = '/'; // Navigate + reload
+        }, 1500);
+        
       }
 
       if(event.data?.type=="installed"){

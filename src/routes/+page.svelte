@@ -35,7 +35,12 @@
             gameName:"Magic Word",
             entryPoint:"/magic-word",
             underConst:false,
-        }
+        },
+        {
+            gameName:"Hive mind",
+            entryPoint:"/hive-mind",
+            underConst:false,
+        },
     ]
 </script>
 

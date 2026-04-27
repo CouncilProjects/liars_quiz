@@ -217,6 +217,14 @@
         ]
     }
 
+    const hivemindDesc:desc={
+        baseIdea:"All players must answer the question, those whose answers match gain a point",
+        prompt:"A free-text question",
+        promptExamples:["Name a movie with an alien","Name a rap song","Name a male movie actor"],
+        baseRoles:[{name:"Guesser",color:"green",purpose:"All players are guessers, those that have the same answer as another player get a point."}],
+        modes:[{name:"normal",descr:"A prompt appears on screen each player must then write their response, those with matching answers get a point",roles:[]}]
+    }
+
 
     const descriptions = {
         "imposter":imposterDesc,
@@ -224,6 +232,7 @@
         "say-again":sayagainDesc,
         "shady-truth":shadytruthDesc,
         "magic-word":magicwordDesc,
+        "hive-mind":hivemindDesc
     }
 
     const actual_names = {
@@ -232,6 +241,7 @@
         "say-again":"Say that again ?",
         "shady-truth":"Shady truth",
         "magic-word":"Magic word",
+        "hive-mind":"Hive Mind"
     }
 
     let description = $derived(descriptions[params.game as keyof typeof descriptions]);

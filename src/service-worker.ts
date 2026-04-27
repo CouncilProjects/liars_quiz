@@ -77,9 +77,9 @@ async function addFilesToCache() {
     console.log('[SERVICE-WORKER]: cashed ' + ASSETS.length + ' files');
 }
 
-self.addEventListener('message',(event)=>{
+self.addEventListener('message',async (event)=>{
     if(event.data?.type=="Install PWA"){
-        event.waitUntil((async ()=>{
+    (async ()=>{
             await addFilesToCache();
             console.log("Files cashed");
             const config = await caches.open(swConfig);
@@ -97,10 +97,11 @@ self.addEventListener('message',(event)=>{
                     version
                 });
             }
-        })());
+        })();
     }
 
     if(event.data.type=="As PWA"){
+        pwa=true;
         console.log("Running PWA");
     }
 })

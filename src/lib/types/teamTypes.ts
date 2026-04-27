@@ -25,6 +25,8 @@ export type magicWordTeamEntry = entry & {
     fortuneTell:number
 }
 
+export type hiveMindTeamEntry = entry
+
 export const createImposterMember = (name: string, score: number): impostorTeamEntry => {
     return { name: name, score: score, impostor: 0 };
 }
@@ -37,14 +39,19 @@ export const createMagicWordMember = (name: string, score: number): magicWordTea
     return { name: name, score: score, chief:0,darkMage:0,fortuneTell:0 };
 }
 
+export const createHiveMindMember = (name: string, score: number): hiveMindTeamEntry => {
+    return { name: name, score: score};
+}
+
 
 export const addEntryFunctionLookup: Record<string, (name: string, score: number) => any> = {
     "fake-out":createImposterMember,
     "imposter": createImposterMember,
     "say-again": createImposterMember,
     "shady-truth":createSchetchyTruthMember,
-    "magic-word":createMagicWordMember
+    "magic-word":createMagicWordMember,
+    "hive-mind":createHiveMindMember,
 }
 
 
-export type team = (impostorTeamEntry|shadyTruthTeamEntry|magicWordTeamEntry)[]
+export type team = (impostorTeamEntry|shadyTruthTeamEntry|magicWordTeamEntry|hiveMindTeamEntry)[]

@@ -6,6 +6,7 @@
     import {useTTS} from '$lib/logic/voice'
 	import { pickRoles } from '$lib/logic/assignRoles';
 	let { data }:PageProps = $props();
+    
 
     $inspect(data.mode);
     if(data.group==null){
