@@ -1,6 +1,6 @@
 {
   "$schema": "../node_modules/@tauri-apps/cli/config.schema.json",
-  "productName": "liars-quiz",
+  "productName": "Liar's party",
   "version": "0.1.0",
   "identifier": "amori.afterdark.liars",
   "build": {
@@ -12,7 +12,7 @@
   "app": {
     "windows": [
       {
-        "title": "liars-quiz",
+        "title": "Liar's party",
         "width": 800,
         "height": 600,
         "resizable": true,
