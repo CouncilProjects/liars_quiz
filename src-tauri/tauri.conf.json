@@ -1,6 +1,6 @@
 {
   "$schema": "../node_modules/@tauri-apps/cli/config.schema.json",
-  "productName": "Liar's party",
+  "productName": "Liars party",
   "version": "0.1.0",
   "identifier": "amori.afterdark.liars",
   "build": {
