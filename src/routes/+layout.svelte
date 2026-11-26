@@ -16,6 +16,7 @@
 
 	function registerSW() {
 		//this practically goes and sees if there is a SW if there is a new SW it downloads it and then installs it.
+		/*
 		if (browser && 'serviceWorker' in navigator) {
 			//register sw
 			navigator.serviceWorker
@@ -27,7 +28,10 @@
 					console.error('SW registration failed:', error);
 				});
 		}
+		*/
 	}
+
+	let update = false;
 
 	function isRunningAsPWA() {
 		return (
@@ -37,13 +41,13 @@
 	}
 
 	function notifySWRunPWA() {
-		navigator.serviceWorker.controller?.postMessage({ type: 'As PWA' });
-		console.log('[LOG] SW notified to act like a PWA.');
+		// navigator.serviceWorker.controller?.postMessage({ type: 'As PWA' });
+		// console.log('[LOG] SW notified to act like a PWA.');
 	}
 
 	function notifySWForInstall() {
-		navigator.serviceWorker.controller?.postMessage({ type: 'Install PWA' });
-		console.log('[LOG] SW notified to act like a PWA.');
+		// navigator.serviceWorker.controller?.postMessage({ type: 'Install PWA' });
+		// console.log('[LOG] SW notified to act like a PWA.');
 	}
 
 	//register SW
@@ -52,9 +56,10 @@
 		if (isRunningAsPWA()) {
 			notifySWRunPWA();
 		}
+		/*
 		navigator.serviceWorker.addEventListener('message', (event) => {
 			if (event.data?.type == 'new-update') {
-				toaster.info({ title: 'Update available', description: 'Refreshing to latest version...' });
+				toaster.info({ title: 'Update available', description: 'Downloading latest version install it when prompted' });
 				setTimeout(() => {
 					window.location.href = '/'; // Navigate + reload
 				}, 1500);
@@ -64,6 +69,7 @@
 				toaster.success({ title: 'Install complete', description: 'You have recieved the app' });
 			}
 		});
+		*/
 	});
 
 	function installableHandler(event: Event) {
@@ -131,4 +137,3 @@
 		</Toast>
 	{/snippet}
 </Toast.Group>
-
