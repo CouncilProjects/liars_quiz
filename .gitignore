@@ -26,8 +26,3 @@ vite.config.ts.timestamp-*
 localhost-key.pem
 localhost.pem
 
-# tauri specific ignores
-src-tauri/gen/
-src-tauri/target
-
-src-tauri/icons
