@@ -27,7 +27,7 @@
     "@tailwindcss/forms": "^0.5.10",
     "@tailwindcss/typography": "^0.5.18",
     "@tailwindcss/vite": "^4.1.13",
-    "@tauri-apps/cli": "^2.11.3",
+    "@tauri-apps/cli": "^2.12.6",
     "prettier": "^3.6.2",
     "prettier-plugin-svelte": "^3.4.0",
     "prettier-plugin-tailwindcss": "^0.6.14",
@@ -39,8 +39,14 @@
   },
   "dependencies": {
     "@lucide/svelte": "^0.548.0",
-    "@tauri-apps/api": "^2.11.1",
+    "@tauri-apps/api": "^2.12.5",
+    "@tauri-apps/plugin-fs": "^2.7.1",
+    "@tauri-apps/plugin-os": "^2.4.0",
+    "@tauri-apps/plugin-process": "^2.4.0",
+    "@tauri-apps/plugin-updater": "^2.14.1",
+    "@tauri-apps/plugin-upload": "^2.5.0",
     "lucide": "^0.548.0",
+    "tauri-plugin-android-installer-api": "^0.1.0",
     "tauri-plugin-tts-api": "^0.1.11"
   }
 }

@@ -7,6 +7,7 @@
   ],
   "permissions": [
     "core:default",
-    "tts:default"
+    "tts:default",
+    "fs:default"
   ]
 }
