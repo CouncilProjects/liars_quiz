@@ -1,16 +1,13 @@
 <script lang="ts">
-	import '../app.css';
-	import LightSwitch from '$lib/components/LightSwitch.svelte';
-	import { onMount } from 'svelte';
-	import { browser } from '$app/environment';
 	import { page } from '$app/state';
+	import LightSwitch from '$lib/components/LightSwitch.svelte';
+	import { handleUpdate } from '$lib/updater';
 	import { Toast, createToaster } from '@skeletonlabs/skeleton-svelte';
-	import { goto } from '$app/navigation';
-
+	import { onMount } from 'svelte';
+	import '../app.css';
 	let { children } = $props();
 	let installable = $state(false);
 	let installPrompt: any | null = null;
-	let updateToast = $state(false);
 
 	const toaster = createToaster({ placement: 'top' });
 
@@ -52,6 +49,16 @@
 
 	//register SW
 	onMount(() => {
+		handleUpdate((a) => {
+			if (update == false) {
+				update = true;
+				toaster.info({
+					title: 'Update available',
+					description: 'Downloading update, install when prompted'
+				});
+			}
+		});
+
 		registerSW();
 		if (isRunningAsPWA()) {
 			notifySWRunPWA();
