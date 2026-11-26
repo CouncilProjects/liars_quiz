@@ -6,11 +6,12 @@
 	import { onMount } from 'svelte';
 	import '../app.css';
 	let { children } = $props();
-	let installable = $state(false);
-	let installPrompt: any | null = null;
+	//let installable = $state(false);
+	//let installPrompt: any | null = null;
 
 	const toaster = createToaster({ placement: 'top' });
 
+	/*
 	function registerSW() {
 		//this practically goes and sees if there is a SW if there is a new SW it downloads it and then installs it.
 		/*
@@ -25,27 +26,29 @@
 					console.error('SW registration failed:', error);
 				});
 		}
+  }
 		*/
-	}
 
 	let update = false;
-
+	/*
 	function isRunningAsPWA() {
 		return (
 			window.matchMedia('(display-mode: standalone)').matches ||
 			(navigator as any).standalone === true
 		);
 	}
+  
 
 	function notifySWRunPWA() {
-		// navigator.serviceWorker.controller?.postMessage({ type: 'As PWA' });
-		// console.log('[LOG] SW notified to act like a PWA.');
+		 navigator.serviceWorker.controller?.postMessage({ type: 'As PWA' });
+		 console.log('[LOG] SW notified to act like a PWA.');
 	}
 
 	function notifySWForInstall() {
-		// navigator.serviceWorker.controller?.postMessage({ type: 'Install PWA' });
-		// console.log('[LOG] SW notified to act like a PWA.');
+		 navigator.serviceWorker.controller?.postMessage({ type: 'Install PWA' });
+		 console.log('[LOG] SW notified to act like a PWA.');
 	}
+  */
 
 	//register SW
 	onMount(() => {
@@ -59,11 +62,12 @@
 			}
 		});
 
+		/*
 		registerSW();
 		if (isRunningAsPWA()) {
 			notifySWRunPWA();
 		}
-		/*
+		
 		navigator.serviceWorker.addEventListener('message', (event) => {
 			if (event.data?.type == 'new-update') {
 				toaster.info({ title: 'Update available', description: 'Downloading latest version install it when prompted' });
@@ -79,6 +83,7 @@
 		*/
 	});
 
+	/*
 	function installableHandler(event: Event) {
 		event.preventDefault();
 		installable = true;
@@ -99,9 +104,10 @@
 		installPrompt = null;
 		installable = false;
 	}
+  */
 </script>
 
-<!--appinstalled when its aready installed, beforeinstallprompt when its installable-->
+<!--appinstalled when its aready installed, beforeinstallprompt when its installable
 <svelte:window
 	onbeforeinstallprompt={installableHandler}
 	onappinstalled={() => {
@@ -109,21 +115,17 @@
 		notifySWForInstall();
 	}}
 />
+-->
 
 <svelte:head>
 	<link rel="icon" href="/favicon.png" />
 	<title>Liars Quiz</title>
-	<link rel="manifest" href="/manifest.webmanifest" />
+	<!--<link rel="manifest" href="/manifest.webmanifest" />-->
 </svelte:head>
 
 {#if page.url.pathname.match('/') || ['general', 'settings'].some( (part) => page.url.pathname.includes(part) )}
 	<div class="flex w-full flex-row px-4 pt-[env(safe-area-inset-top)]">
 		<LightSwitch></LightSwitch>
-		<button
-			class="ml-auto btn preset-filled-primary-300-700"
-			hidden={installable == false}
-			onclick={installPressed}>Install</button
-		>
 	</div>
 {/if}
 
