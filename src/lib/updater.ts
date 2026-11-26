@@ -86,7 +86,7 @@ export async function handleUpdate(progressSetter: (a: number) => void) {
     if (! await exists(path)) {
       try {
         await download(
-          `https://github.com/${REPO}/releases/latest/download/Liars party_${latest.version}_universal.apk`,
+          `https://github.com/${REPO}/releases/latest/download/Liars.party_${latest.version}_universal.apk`,
           path,
           ({ progressTotal, total }) => {
             console.log(`Downloaded ${progressTotal} of ${total} bytes for new apk`), // a callback that will be called with the download progress
